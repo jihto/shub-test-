@@ -1,21 +1,18 @@
-import { useState } from 'react';
-import './App.css';
+import { useEffect, useState } from 'react'; 
 import * as XLSX from 'xlsx'; 
 import { DataProps, headersDataKeys } from './type';
 
 
-function App() {
-
+function App() { 
   const [data, setData] = useState<Array<DataProps[]>>([]);
+  const [startTime, setStartTime] = useState<string>('');
+  const [endTime, setEndTime] = useState<string>('');
 
   const readExcel = (file: File) => {
-    const reader = new FileReader();
-
+    const reader = new FileReader(); 
     reader.onload = (event) => {
       const data = new Uint8Array(event.target?.result as ArrayBuffer);
-      const workbook = XLSX.read(data, { type: 'array' });
-
-      // Get the first sheet
+      const workbook = XLSX.read(data, { type: 'array' }); 
       const sheetName = workbook.SheetNames[0];
       const worksheet = workbook.Sheets[sheetName];
 
@@ -35,6 +32,7 @@ function App() {
       filteredData = filteredData.map((row: any[]) =>
         Array.from({ length: maxColumns }, (_, index) => row[index] ?? "")
       );  
+      localStorage.setItem("data", JSON.stringify(filteredData));
       setData(filteredData);
     };
 
@@ -48,13 +46,49 @@ function App() {
     }
   };
 
+  const handleDateFromChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    console.log(event.target.value)
+    setStartTime(event.target.value); 
+  };
+
+  const handleDateToChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    console.log(event.target.value)
+    setEndTime(event.target.value); 
+  };
+
+  useEffect(() => {
+    const getDataLocal = localStorage.getItem("data");
+    if(getDataLocal){
+      const dataLocal: any[] = JSON.parse(getDataLocal);
+      if(Array.isArray(dataLocal))
+        setData(dataLocal);
+    };  
+  }, [])
+
+
+  useEffect(() => {
+    if (startTime !== "" && endTime !== "" && data.length > 0){
+       
+      // setData(prev => 
+      //   prev.filter((item: any) => {
+      //   const date: Date = new Date(item["Ngày"]);
+      //   console.log({ date, start, end})
+      //   return date >= start && date <= end;
+      // }))
+      console.log(startTime, endTime);
+    }
+  }, [startTime, endTime]);
   return (
     <>
-      <input type="file" accept=".xlsx" onChange={handleFileUpload} /> 
-      <div className="flex justify-center items-center h-screen">
-        <div className="max-h-[500px] overflow-auto w-full rounded-xl">
-          <table className="table-auto border-collapse border border-gray-300 w-full">
-            <thead className='sticky'>
+      <p className='text-5xl my-10'>DATA REPORT</p>
+      <div className='my-10'>
+        <p>Upload data from here:</p>
+        <input className='bg-white px-2 py-1 text-gray-400 rounded-full' type="file" accept=".xlsx" onChange={handleFileUpload} /> 
+      </div>
+      <div className="flex justify-center items-center">
+        <div className="max-h-[500px] overflow-y-auto w-full rounded-xl">
+          <table className="table-auto border-collapse border border-gray-300 w-full h-[500px] ">
+            <thead className="sticky top-0 bg-gray-200">
               <tr>
                 {headersDataKeys.map((header: string, index: number) => (
                   <th key={index}
@@ -79,7 +113,13 @@ function App() {
           </table>
         </div>
       </div>
+      <div className='flex gap-4 justify-center items-center'>
+        <label htmlFor="dateInput">Chọn ngày từ:</label>
+        <input onChange={handleDateFromChange} type='time' className='text-xl py-2 px-4 rounded-full'/>
+        <p> đến </p>
+        <input onChange={handleDateToChange} type='time' className='text-xl py-2 px-4 rounded-full'/>
 
+      </div>
     </>
   );
 
