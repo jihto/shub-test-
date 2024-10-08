@@ -46,16 +46,22 @@ function App() {
   };
 
   const handleQuery = (start: Date, end: Date) => {  
-    const filteredData = data.filter((item: DataProps[]) => { 
+    try {
+      const filteredData = data.filter((item: DataProps[]) => { 
       const date = new Date(`2024-10-10T${item[2].toString()}`); 
-      return date >= start && date <= end;
-    }) 
-    const totalPrice = filteredData.reduce((total, item) => {
-      return total + Number(item[8]); // Ensure to convert to number
-    }, 0);
-    if(filteredData)
-      setTotalPrice(totalPrice);
-      setData(filteredData);
+        return date >= start && date <= end;
+      }) 
+      const totalPrice = filteredData.reduce((total, item) => {
+        return total + Number(item[8]); 
+      }, 0);
+      if(filteredData){
+        setTotalPrice(totalPrice);
+        setData(filteredData);
+      }
+    } catch (error) {
+      setTotalPrice(0);
+      setData([]);   
+    } 
   }
 
   useEffect(() => {
@@ -72,8 +78,8 @@ function App() {
     <>
       <p className='text-5xl my-10'>Báo cáo giao dịch</p>
       <div className="flex justify-center items-center">
-        <div className="max-h-[500px] overflow-y-auto w-full rounded-xl">
-          <table className="table-auto border-collapse border border-gray-300 w-full h-[500px] ">
+        <div className="max-h-[500px] md:max-h-[600px] overflow-y-auto w-full text-xs rounded-xl">
+          <table className="table-auto border-collapse border border-gray-300 w-full h-[500px] md:h-[600px] ">
             <thead className="sticky top-0 bg-gray-200">
               <tr>
                 {headersDataKeys.map((header: string, index: number) => (
@@ -99,11 +105,13 @@ function App() {
           </table>
         </div>
       </div>
-      <div className='my-10 flex justify-center align-middle gap-10 items-center'>
-        <p>Upload data from here:</p>
-        <input className='bg-white px-2 py-1 text-gray-400 rounded-full' type="file" accept=".xlsx" onChange={handleFileUpload} /> 
+      <div className='lg:flex lg:flex-row justify-between mx-0 lg:mx-20'>
+        <div className='my-5 lg:my-10 flex justify-center align-middle gap-1 items-center'>
+          <p>Upload data from here (only .xlsx):</p>
+          <input className='bg-white px-2 py-1 text-gray-400 rounded-full' type="file" accept=".xlsx" onChange={handleFileUpload} /> 
+        </div>
+        <p className='my-10'>Tổng Thành tiền: {totalPrice}</p>
       </div>
-      <p className='text-3xl my-10'>Tổng Thành tiền: {totalPrice}</p>
       <TimeRangeFilter onSubmit={handleQuery}/>
     </>
   );

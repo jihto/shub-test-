@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import toast from 'react-hot-toast';
 
 interface TimeRangeFilterProps{
     onSubmit: ( startTime: Date, endTime:Date ) => void;
@@ -8,9 +9,7 @@ const TimeRangeFilter:React.FC<TimeRangeFilterProps> = ({
     onSubmit
 }) => {
     const [startTime, setStartTime] = useState<string>('');
-    const [endTime, setEndTime] = useState<string>('');
-
-
+    const [endTime, setEndTime] = useState<string>(''); 
     const handleDateFromChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         console.log(event.target.value)
         setStartTime(event.target.value); 
@@ -27,17 +26,27 @@ const TimeRangeFilter:React.FC<TimeRangeFilterProps> = ({
         const t2 = new Date(`2024-10-10T${endTime}`); 
         t1 < t2 
             ? onSubmit( t1, t2 )
-            : console.log("Error");
+            : toast.error('Thời gian bắt đầu không thể lớn hơn thời gian kết thúc');
     }
 
     return (
-        <div className='flex gap-4 justify-center items-center'>
-            <label htmlFor="dateInput">Chọn ngày từ:</label>
-            <input onChange={handleDateFromChange} type='time' step={2} className='text-xl py-2 px-4 rounded-full'/>
-            <p> đến </p>
-            <input onChange={handleDateToChange} type='time' step={2} className='text-xl py-2 px-4 rounded-full'/> 
-            <button onClick={handleSubmit} className='bg-blue-500 text-white px-4 py-2 rounded-full'>Tìm kiếm</button>
-        </div>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center ">
+        <label htmlFor="dateInput"> Chọn ngày từ: </label>
+        <input
+            onChange={handleDateFromChange}
+            type="time"
+            step={2}
+            className=" py-2 px-4 rounded-full"
+        />
+        <p>đến</p>
+        <input
+            onChange={handleDateToChange}
+            type="time"
+            step={2}
+            className=" py-2 px-4 rounded-full"
+        />
+        <button onClick={handleSubmit}  className="bg-blue-500 text-white px-4 py-2 rounded-full" > Tìm kiếm </button>
+    </div> 
     )
 }
 
