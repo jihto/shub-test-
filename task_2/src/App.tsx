@@ -1,15 +1,41 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg' 
+import { useState } from 'react';
+import toast from 'react-hot-toast';
+
+type ErrorNumber = -1 | 0 | 1 | 2 | 3 |4
+
 
 function App() {
-  const [time, setTime] = useState("07/10/2024 17:25:02");
-  const [quantity, setQuantity] = useState("3.03");
-  const [column, setColumn] = useState("");
-  const [revenue, setRevenue] = useState("60000");
-  const [price, setPrice] = useState("19800");
+  const [time, setTime] = useState("");
+  const [quantity, setQuantity] = useState<number>(3.03);
+  const [column, setColumn] = useState<number>(0);
+  const [revenue, setRevenue] = useState<number>(60000);
+  const [price, setPrice] = useState<number>(19800);
+  const [error, setError] = useState<ErrorNumber>(-1);
+
 
   const handleUpdate = () => {
+    if(typeof time !== "string" || time.length < 1){
+      toast.error("Vui lòng chọn ngày")
+      return setError(0);
+    }
+    if(typeof quantity !== "number" || quantity < 0){
+      toast.error("Vui lòng nhập số lượng đúng định dạng");
+      return setError(1);
+    }
+    if(typeof column !== "number" || column < 1){
+      toast.error("Vui loại chọn trụ");
+      return setError(2);
+    } 
+    if(typeof revenue !== "number" || revenue < 0){
+      toast.error("Vui lòng nhập doanh thu đúng định dạng");
+      return setError(3);
+    }
+    if(typeof price !== "number" || price < 0){
+      toast.error("Vui lòng nhập giá đúng định dạng");
+      return setError(4);
+    }
+    setError(-1)
+    toast.success(`Gửi thành công: thời gian: ${time}, số lượng: ${quantity}, trụ: ${column}, doanh thu: ${revenue}, giá: ${price}`)
     console.log({
       time,
       quantity,
@@ -23,12 +49,9 @@ function App() {
     <div className="max-w-lg mx-auto mt-10 p-4">
       {/* Header */}
       <div className='shadow-md mb-4 px-2 pb-10'>
-        <div className="flex justify-between items-center mb-6">
-          <button className="text-blue-500">← Đóng</button> 
-          <button
-            onClick={handleUpdate}
-            className="bg-blue-500 text-white px-4 py-2 rounded-lg"
-          >
+        <div className="flex justify-between items-center">
+          <button>← Đóng</button> 
+          <button onClick={handleUpdate}className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:opacity-90">
             Cập nhật
           </button>
         </div>
@@ -37,39 +60,35 @@ function App() {
       {/* Form */}
       <div className="bg-white p-6 rounded-lg shadow-md space-y-4">
         {/* Time Input */}
-        <div>
-          <label className="block mb-2 font-medium">Thời gian</label>
-          <div className="relative">
+        <div className='relative'>
+          <label className="absolute top-1 left-4 block mb-2 text-gray-600 text-sm font-thin">Thời gian</label> 
             <input
-              type="text"
+              type="datetime-local"
+              id="datetime"
               value={time}
               onChange={(e) => setTime(e.target.value)}
-              className="w-full text-lg py-2 px-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <span className="absolute right-4 top-2.5 text-gray-400">
-              🗓️
-            </span>
-          </div>
+              className={`w-full pt-6 text-lg py-2 px-4 border rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 ${error === 0 ? 'border-red-400' : "border-gray-300"}`}
+            /> 
         </div>
 
         {/* Quantity Input */}
-        <div>
-          <label className="block mb-2 font-medium">Số lượng</label>
+        <div className='relative'>
+          <label className="absolute top-1 left-4 block mb-2 text-gray-600 text-sm font-thin">Số lượng</label>
           <input
-            type="text"
+            type="number"
             value={quantity}
-            onChange={(e) => setQuantity(e.target.value)}
-            className="w-full text-lg py-2 px-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            onChange={(e) => setQuantity(Number(e.target.value))}
+            className={`w-full pt-6 text-lg py-2 px-4 border rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 ${error === 1 ? 'border-red-400' : "border-gray-300"}`}
           />
         </div>
 
         {/* Column (Trụ) */}
-        <div>
-          <label className="block mb-2 font-medium">Trụ</label>
+        <div className='relative'>
+          <label className="absolute top-1 left-4 block mb-2 text-gray-600 text-sm font-thin">Trụ</label>
           <select
             value={column}
-            onChange={(e) => setColumn(e.target.value)}
-            className="w-full text-lg py-2 px-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            onChange={(e) => setColumn(Number(e.target.value))}
+            className={`w-full pt-6 text-lg py-2 px-3 border rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 ${error === 2 ? 'border-red-400' : "border-gray-300"}`}
           >
             <option value="" disabled>
               Chọn trụ
@@ -80,24 +99,24 @@ function App() {
         </div>
 
         {/* Revenue Input */}
-        <div>
-          <label className="block mb-2 font-medium">Doanh thu</label>
+        <div className='relative'>
+          <label className="absolute top-1 left-4 block mb-2 text-gray-600 text-sm font-thin">Doanh thu</label>
           <input
-            type="text"
+            type="number"
             value={revenue}
-            onChange={(e) => setRevenue(e.target.value)}
-            className="w-full text-lg py-2 px-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            onChange={(e) => setRevenue(Number(e.target.value))}
+            className={`w-full pt-6 text-lg py-2 px-4 border rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 ${error === 3 ? 'border-red-400' : "border-gray-300"}`}
           />
-        </div>
+        </div> 
 
         {/* Price Input */}
-        <div>
-          <label className="block mb-2 font-medium">Đơn giá</label>
+        <div className='relative'>
+          <label className="absolute top-1 left-4 block mb-2 text-gray-600 text-sm font-thin">Đơn giá</label>
           <input
-            type="text"
+            type="number"
             value={price}
-            onChange={(e) => setPrice(e.target.value)}
-            className="w-full text-lg py-2 px-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            onChange={(e) => setPrice(Number(e.target.value))}
+            className={`w-full pt-6 text-lg py-2 px-4 border rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 ${error === 4 ? 'border-red-400' : "border-gray-300"}`}
           />
         </div>
       </div>
