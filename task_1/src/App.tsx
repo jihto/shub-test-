@@ -1,13 +1,12 @@
 import { useEffect, useState } from 'react'; 
 import * as XLSX from 'xlsx'; 
 import { DataProps, headersDataKeys } from './type';
+import TimeRangeFilter from './components/TimeRangeFilter';
 
 
 function App() { 
-  const [data, setData] = useState<Array<DataProps[]>>([]);
-  const [startTime, setStartTime] = useState<string>('');
-  const [endTime, setEndTime] = useState<string>('');
-
+  const [data, setData] = useState<Array<DataProps[]>>([]); 
+  const [totalPrice, setTotalPrice]= useState<number>(0);
   const readExcel = (file: File) => {
     const reader = new FileReader(); 
     reader.onload = (event) => {
@@ -46,15 +45,18 @@ function App() {
     }
   };
 
-  const handleDateFromChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(event.target.value)
-    setStartTime(event.target.value); 
-  };
-
-  const handleDateToChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(event.target.value)
-    setEndTime(event.target.value); 
-  };
+  const handleQuery = (start: Date, end: Date) => {  
+    const filteredData = data.filter((item: DataProps[]) => { 
+      const date = new Date(`2024-10-10T${item[2].toString()}`); 
+      return date >= start && date <= end;
+    }) 
+    const totalPrice = filteredData.reduce((total, item) => {
+      return total + Number(item[8]); // Ensure to convert to number
+    }, 0);
+    if(filteredData)
+      setTotalPrice(totalPrice);
+      setData(filteredData);
+  }
 
   useEffect(() => {
     const getDataLocal = localStorage.getItem("data");
@@ -66,25 +68,9 @@ function App() {
   }, [])
 
 
-  useEffect(() => {
-    if (startTime !== "" && endTime !== "" && data.length > 0){
-       
-      // setData(prev => 
-      //   prev.filter((item: any) => {
-      //   const date: Date = new Date(item["Ngày"]);
-      //   console.log({ date, start, end})
-      //   return date >= start && date <= end;
-      // }))
-      console.log(startTime, endTime);
-    }
-  }, [startTime, endTime]);
   return (
     <>
-      <p className='text-5xl my-10'>DATA REPORT</p>
-      <div className='my-10'>
-        <p>Upload data from here:</p>
-        <input className='bg-white px-2 py-1 text-gray-400 rounded-full' type="file" accept=".xlsx" onChange={handleFileUpload} /> 
-      </div>
+      <p className='text-5xl my-10'>Báo cáo giao dịch</p>
       <div className="flex justify-center items-center">
         <div className="max-h-[500px] overflow-y-auto w-full rounded-xl">
           <table className="table-auto border-collapse border border-gray-300 w-full h-[500px] ">
@@ -113,13 +99,12 @@ function App() {
           </table>
         </div>
       </div>
-      <div className='flex gap-4 justify-center items-center'>
-        <label htmlFor="dateInput">Chọn ngày từ:</label>
-        <input onChange={handleDateFromChange} type='time' className='text-xl py-2 px-4 rounded-full'/>
-        <p> đến </p>
-        <input onChange={handleDateToChange} type='time' className='text-xl py-2 px-4 rounded-full'/>
-
+      <div className='my-10 flex justify-center align-middle gap-10 items-center'>
+        <p>Upload data from here:</p>
+        <input className='bg-white px-2 py-1 text-gray-400 rounded-full' type="file" accept=".xlsx" onChange={handleFileUpload} /> 
       </div>
+      <p className='text-3xl my-10'>Tổng Thành tiền: {totalPrice}</p>
+      <TimeRangeFilter onSubmit={handleQuery}/>
     </>
   );
 
