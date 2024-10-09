@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 
-type ErrorNumber = -1 | 0 | 1 | 2 | 3 |4
+type ErrorNumber = -1 | 0 | 1 | 2 | 3 |4;
 
 
 function App() {
@@ -15,23 +15,19 @@ function App() {
 
   const handleUpdate = () => {
     if(typeof time !== "string" || time.length < 1){
-      toast.error("Vui lòng chọn ngày")
       return setError(0);
     }
-    if(typeof quantity !== "number" || quantity < 0){
-      toast.error("Vui lòng nhập số lượng đúng định dạng");
+    if(typeof quantity !== "number" || quantity < 1){ 
       return setError(1);
     }
     if(typeof column !== "number" || column < 1){
       toast.error("Vui loại chọn trụ");
       return setError(2);
     } 
-    if(typeof revenue !== "number" || revenue < 0){
-      toast.error("Vui lòng nhập doanh thu đúng định dạng");
+    if(typeof revenue !== "number" || revenue < 1){ 
       return setError(3);
     }
-    if(typeof price !== "number" || price < 0){
-      toast.error("Vui lòng nhập giá đúng định dạng");
+    if(typeof price !== "number" || price < 1){ 
       return setError(4);
     }
     setError(-1)
@@ -69,6 +65,7 @@ function App() {
               onChange={(e) => setTime(e.target.value)}
               className={`w-full pt-6 text-lg py-2 px-4 border rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 ${error === 0 ? 'border-red-400' : "border-gray-300"}`}
             /> 
+            <p className={`${error === 0 ? 'block' : 'hidden'} text-sm text-red-400 mt-1`}>*Vui lòng chọn ngày</p>
         </div>
 
         {/* Quantity Input */}
@@ -80,6 +77,7 @@ function App() {
             onChange={(e) => setQuantity(Number(e.target.value))}
             className={`w-full pt-6 text-lg py-2 px-4 border rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 ${error === 1 ? 'border-red-400' : "border-gray-300"}`}
           />
+          <p className={`${error === 1 ? 'block' : 'hidden'} text-sm text-red-400 mt-1`}>*Vui lòng nhập số lượng đúng định dạng</p>
         </div>
 
         {/* Column (Trụ) */}
@@ -90,12 +88,13 @@ function App() {
             onChange={(e) => setColumn(Number(e.target.value))}
             className={`w-full pt-6 text-lg py-2 px-3 border rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 ${error === 2 ? 'border-red-400' : "border-gray-300"}`}
           >
-            <option value="" disabled>
+            <option value="0" disabled>
               Chọn trụ
             </option>
             <option value="1">Trụ 1</option>
             <option value="2">Trụ 2</option>
           </select>
+          <p className={`${error === 2 ? 'block' : 'hidden'} text-sm text-red-400 mt-1`}>*Vui loại chọn trụ</p>
         </div>
 
         {/* Revenue Input */}
@@ -107,6 +106,7 @@ function App() {
             onChange={(e) => setRevenue(Number(e.target.value))}
             className={`w-full pt-6 text-lg py-2 px-4 border rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 ${error === 3 ? 'border-red-400' : "border-gray-300"}`}
           />
+          <p className={`${error === 3 ? 'block' : 'hidden'} text-sm text-red-400 mt-1`}>*Vui lòng nhập doanh thu đúng định dạng</p>
         </div> 
 
         {/* Price Input */}
@@ -118,6 +118,7 @@ function App() {
             onChange={(e) => setPrice(Number(e.target.value))}
             className={`w-full pt-6 text-lg py-2 px-4 border rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 ${error === 4 ? 'border-red-400' : "border-gray-300"}`}
           />
+          <p className={`${error === 4 ? 'block' : 'hidden'} text-sm text-red-400 mt-1`}>*Vui lòng nhập giá đúng định dạng</p>
         </div>
       </div>
     </div>
